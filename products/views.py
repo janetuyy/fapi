@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import crud
@@ -6,7 +6,7 @@ from .schemas import Product, ProductCreate, ProductUpdate, ProductUpdatePartial
 from core.models import db_helper
 from .dependencies import product_by_id
 
-router = APIRouter(tags=["Products"])
+router = APIRouter(prefix="/products", tags=["Products"])
 
 
 @router.get("/", response_model=list[Product])
