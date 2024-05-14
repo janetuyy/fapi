@@ -5,7 +5,7 @@ from pydantic.v1 import BaseSettings
 
 
 class Settings(BaseSettings):
-    db_url: str = f"postgresql+asyncpg://postgres:postgres@localhost:5432/TestFAapp"
+    db_url: str = f"postgresql+asyncpg://postgres:postgres@db:5432/TestFAapp"
     db_echo: bool = True
 
 
