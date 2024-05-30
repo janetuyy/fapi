@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 from users.views import router as users_router
 from products.views import router as products_router
-
+from auth.jwt_auth import router as auth_router
 
 
 @asynccontextmanager
@@ -18,6 +18,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 # app.include_router(items_router)
 app.include_router(users_router)
+app.include_router(auth_router)
 app.include_router(products_router)
 
 @app.get("/")
