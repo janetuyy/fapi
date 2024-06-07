@@ -5,5 +5,6 @@ from .base import Base
 
 class User(Base):
     username: Mapped[str]
-    password: Mapped[bytes]
+    password: Mapped[str]
     email: Mapped[str]
+    active: Mapped[bool]

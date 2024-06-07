@@ -5,14 +5,15 @@ from annotated_types import MinLen, MaxLen
 
 class CreateUser(BaseModel):
     username: Annotated[str, MinLen(3), MaxLen(20)]
-    password: bytes
+    password: str
     email: EmailStr | None = None
+    active: bool = True
 
 
 class UserSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
     username: Annotated[str, MinLen(3), MaxLen(20)]
-    password: bytes
+    password: str
     email: EmailStr | None = None
     active: bool = True

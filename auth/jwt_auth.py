@@ -10,8 +10,13 @@ from fastapi.security import (
     OAuth2PasswordBearer,
 )
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.models import db_helper, User
+from core.models.db_helper import DatabaseHelper
 
 from auth import utils as auth_utils
+from users.crud import get_users_dict
 from users.schemas import UserSchema
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -26,26 +31,13 @@ class TokenInfo(BaseModel):
 
 router = APIRouter(prefix="/jwt", tags=["JWT"])
 
-john = UserSchema(
-    username="john",
-    password=auth_utils.hash_password("qwerty"),
-    email="john@example.com",
-)
-sam = UserSchema(
-    username="sam",
-    password=auth_utils.hash_password("secret"),
-)
 
-users_db: dict[str, UserSchema] = {
-    john.username: john,
-    sam.username: sam,
-}
-
-
-def validate_auth_user(
+async def validate_auth_user(
     username: str = Form(),
     password: str = Form(),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
+    users_db = await get_users_dict(session=session)
     unauthed_exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="invalid username or password",
@@ -55,7 +47,7 @@ def validate_auth_user(
 
     if not auth_utils.validate_password(
         password=password,
-        hashed_password=user.password,
+        hashed_password=auth_utils.hash_password(user.password),
     ):
         raise unauthed_exc
 
@@ -83,10 +75,12 @@ def get_current_token_payload(
     return payload
 
 
-def get_current_auth_user(
+async def get_current_auth_user(
     payload: dict = Depends(get_current_token_payload),
-) -> UserSchema:
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> User:
     username: str | None = payload.get("sub")
+    users_db = await get_users_dict(session=session)
     if user := users_db.get(username):
         return user
     raise HTTPException(
