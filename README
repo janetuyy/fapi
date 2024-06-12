@@ -1,5 +1,13 @@
 Запуск для локальной разработки
 
+Генерация privat and public key:
+mkdir certs
+cd certs
+
+openssl genrsa -out jwt-private.pem 2048
+
+openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
+
 Запустить проект:
 
 docker-compose up -d
